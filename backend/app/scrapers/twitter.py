@@ -40,7 +40,7 @@ class TwitterScraper(BaseScraper):
 
     def __init__(self, companies_data: dict):
         super().__init__(companies_data)
-        self.bearer_token = os.getenv("TWITTER_BEARER_TOKEN")
+        self.bearer_token = settings.twitter_bearer_token or os.getenv("TWITTER_BEARER_TOKEN")
 
     async def scrape(self) -> List[dict]:
         """Scrape tweets about NSE companies."""
