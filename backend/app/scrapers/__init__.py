@@ -3,6 +3,9 @@
 from app.scrapers.base import BaseScraper
 from app.scrapers.business_daily import BusinessDailyScraper
 from app.scrapers.nation import NationScraper
+from app.scrapers.the_star import TheStarScraper
+from app.scrapers.citizen_digital import CitizenDigitalScraper
+from app.scrapers.twitter import TwitterScraper
 from app.config import NSE_COMPANIES
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import Article, Company
@@ -14,6 +17,9 @@ import asyncio
 SCRAPERS = [
     BusinessDailyScraper,
     NationScraper,
+    TheStarScraper,
+    CitizenDigitalScraper,
+    TwitterScraper,  # Requires TWITTER_BEARER_TOKEN env var
 ]
 
 

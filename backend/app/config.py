@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     scrape_timeout: int = 30
     max_articles_per_source: int = 50
 
+    # Twitter API (optional)
+    twitter_bearer_token: str = ""
+
     class Config:
         env_file = ".env"
         extra = "ignore"
@@ -99,11 +102,31 @@ NEWS_SOURCES = {
     "business_daily": {
         "name": "Business Daily Africa",
         "rss_url": "https://www.businessdailyafrica.com/bd/rss.xml",
-        "base_url": "https://www.businessdailyafrica.com"
+        "base_url": "https://www.businessdailyafrica.com",
+        "type": "rss"
     },
     "nation": {
         "name": "Nation Business",
         "rss_url": "https://nation.africa/kenya/business/rss",
-        "base_url": "https://nation.africa"
+        "base_url": "https://nation.africa",
+        "type": "rss"
+    },
+    "the_star": {
+        "name": "The Star Kenya",
+        "base_url": "https://www.the-star.co.ke",
+        "business_url": "https://www.the-star.co.ke/business",
+        "type": "web"
+    },
+    "citizen_digital": {
+        "name": "Citizen Digital",
+        "base_url": "https://citizen.digital",
+        "business_url": "https://citizen.digital/business",
+        "type": "web"
+    },
+    "twitter": {
+        "name": "Twitter/X",
+        "type": "api",
+        "requires_auth": True,
+        "env_key": "TWITTER_BEARER_TOKEN"
     }
 }
