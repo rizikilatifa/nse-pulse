@@ -15,7 +15,7 @@ lxml[html_clean]==5.1.0
 
 # Sentiment Analysis
 transformers==4.37.0
-torch==2.1.2
+torch>=2.2.0
 vaderSentiment==3.3.2
 
 # Utilities

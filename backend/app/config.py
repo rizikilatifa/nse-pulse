@@ -98,12 +98,12 @@ NSE_COMPANIES: List[Dict[str, str]] = [
 NEWS_SOURCES = {
     "business_daily": {
         "name": "Business Daily Africa",
-        "rss_url": "https://www.businessdailyafrica.com/rss",
+        "rss_url": "https://www.businessdailyafrica.com/bd/rss.xml",
         "base_url": "https://www.businessdailyafrica.com"
     },
     "nation": {
         "name": "Nation Business",
-        "rss_url": "https://nation.africa/kenya/business/--/1953090/rss",
+        "rss_url": "https://nation.africa/kenya/business/rss",
         "base_url": "https://nation.africa"
     }
 }
