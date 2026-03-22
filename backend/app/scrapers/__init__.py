@@ -5,6 +5,10 @@ from app.scrapers.business_daily import BusinessDailyScraper
 from app.scrapers.nation import NationScraper
 from app.scrapers.the_star import TheStarScraper
 from app.scrapers.citizen_digital import CitizenDigitalScraper
+from app.scrapers.capital_fm import CapitalFMScraper
+from app.scrapers.kenya_wall_street import KenyaWallStreetScraper
+from app.scrapers.kbc import KBCScraper
+from app.scrapers.pulse_live import PulseLiveScraper
 from app.scrapers.twitter import TwitterScraper
 from app.config import NSE_COMPANIES
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,11 +19,19 @@ import asyncio
 
 
 SCRAPERS = [
+    # RSS-based scrapers (most reliable)
     BusinessDailyScraper,
-    NationScraper,
+    CapitalFMScraper,
+    KenyaWallStreetScraper,
+    KBCScraper,
+    PulseLiveScraper,
+    # Web scrapers
     TheStarScraper,
     CitizenDigitalScraper,
-    TwitterScraper,  # Requires TWITTER_BEARER_TOKEN env var
+    # API scrapers (require authentication)
+    TwitterScraper,  # Requires TWITTER_BEARER_TOKEN
+    # Currently blocked
+    # NationScraper,  # 403 Forbidden
 ]
 
 

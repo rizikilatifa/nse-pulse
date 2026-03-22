@@ -109,7 +109,8 @@ NEWS_SOURCES = {
         "name": "Nation Business",
         "rss_url": "https://nation.africa/kenya/business/rss",
         "base_url": "https://nation.africa",
-        "type": "rss"
+        "type": "rss",
+        "status": "blocked"  # 403 Forbidden
     },
     "the_star": {
         "name": "The Star Kenya",
@@ -123,10 +124,35 @@ NEWS_SOURCES = {
         "business_url": "https://citizen.digital/business",
         "type": "web"
     },
+    "capital_fm": {
+        "name": "Capital FM Kenya",
+        "rss_url": "https://capitalfm.co.ke/business/feed/",
+        "base_url": "https://capitalfm.co.ke",
+        "type": "rss"
+    },
+    "kenya_wall_street": {
+        "name": "Kenya Wall Street",
+        "rss_url": "https://www.kenyawallstreet.com/feed/",
+        "base_url": "https://www.kenyawallstreet.com",
+        "type": "rss"
+    },
+    "kbc": {
+        "name": "KBC Kenya",
+        "rss_url": "https://www.kbc.co.ke/feed/",
+        "base_url": "https://www.kbc.co.ke",
+        "type": "rss"
+    },
+    "pulse_live": {
+        "name": "Pulse Live Kenya",
+        "rss_url": "https://www.pulse.co.ke/business/rss",
+        "base_url": "https://www.pulse.co.ke",
+        "type": "rss"
+    },
     "twitter": {
         "name": "Twitter/X",
         "type": "api",
         "requires_auth": True,
-        "env_key": "TWITTER_BEARER_TOKEN"
+        "env_key": "TWITTER_BEARER_TOKEN",
+        "note": "Requires Basic tier ($100/mo) for search access"
     }
 }
