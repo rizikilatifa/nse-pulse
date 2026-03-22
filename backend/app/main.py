@@ -63,9 +63,9 @@ app.add_middleware(
 app.include_router(sentiment.router, prefix="/api", tags=["sentiment"])
 
 
-@app.get("/", response_model=dict)
-async def root():
-    """Root endpoint - API info."""
+@app.get("/api/info", response_model=dict)
+async def api_info():
+    """API info endpoint."""
     return {
         "name": settings.app_name,
         "version": settings.app_version,
