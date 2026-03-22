@@ -23,15 +23,15 @@ SCRAPERS = [
     BusinessDailyScraper,
     CapitalFMScraper,
     KenyaWallStreetScraper,
-    KBCScraper,
-    PulseLiveScraper,
     # Web scrapers
     TheStarScraper,
     CitizenDigitalScraper,
     # API scrapers (require authentication)
     TwitterScraper,  # Requires TWITTER_BEARER_TOKEN
-    # Currently blocked
+    # Currently blocked or unreliable
     # NationScraper,  # 403 Forbidden
+    # KBCScraper,  # Removed - returns unrelated content
+    # PulseLiveScraper,  # 404 Not Found
 ]
 
 

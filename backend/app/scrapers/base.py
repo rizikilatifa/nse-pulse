@@ -6,6 +6,35 @@ from typing import Optional
 import re
 
 
+# Financial keywords that indicate investment-relevant content
+FINANCIAL_KEYWORDS = [
+    # Performance metrics
+    "profit", "loss", "revenue", "earnings", "income", "dividend", "yield",
+    "growth", "decline", "increase", "decrease", "surge", "drop", "rise",
+    # Stock/Market terms
+    "stock", "share", "price", "market", "trading", "nse", "ipo", "listing",
+    "investor", "investment", "portfolio", "capital", "equity", "valuation",
+    # Business operations
+    "acquisition", "merger", "buyout", "stake", "ownership", "deal", "contract",
+    "expansion", "restructuring", "layoff", "retrenchment", "hire", "ceo", "cfo",
+    # Financial reports
+    "results", "report", "quarterly", "annual", "financial", "accounts", "audit",
+    "balance sheet", "cash flow", "turnover", "margin", "debt", "loan", "credit",
+    # Regulatory/Legal
+    "regulator", "cbk", "capital markets", "compliance", "fine", "penalty",
+    # Economic context
+    "interest rate", "inflation", "forex", "currency", "shilling", "dollar",
+]
+
+# Non-financial keywords to exclude (sports, entertainment, lifestyle)
+EXCLUDE_KEYWORDS = [
+    "sports", "football", "rugby", "athletics", "chapa dimba", "tournament",
+    "league", "match", "game", "player", "coach", "team", "win", "score",
+    "entertainment", "music", "concert", "celebrity", "fashion", "lifestyle",
+    "wedding", "relationship", "dating", "recipe", "food", "travel", "tourism",
+]
+
+
 class BaseScraper(ABC):
     """Abstract base class for news scrapers."""
 
@@ -35,6 +64,35 @@ class BaseScraper(ABC):
         """
         pass
 
+    def is_financial_article(self, text: str) -> bool:
+        """
+        Check if article contains financial/investment-relevant context.
+
+        Args:
+            text: Article headline + content
+
+        Returns:
+            True if article appears to be financially relevant
+        """
+        if not text:
+            return False
+
+        text_lower = text.lower()
+
+        # First check for exclude keywords
+        for keyword in EXCLUDE_KEYWORDS:
+            pattern = r'\b' + re.escape(keyword.lower()) + r'\b'
+            if re.search(pattern, text_lower):
+                return False
+
+        # Check for financial keywords
+        for keyword in FINANCIAL_KEYWORDS:
+            pattern = r'\b' + re.escape(keyword.lower()) + r'\b'
+            if re.search(pattern, text_lower):
+                return True
+
+        return False
+
     def match_ticker(self, text: str) -> Optional[str]:
         """
         Match article text to a company ticker using keywords.
@@ -55,7 +113,6 @@ class BaseScraper(ABC):
                 keyword_lower = keyword.lower()
                 # Use word boundary matching to avoid partial matches
                 # e.g., "manageable" should NOT match "eabl"
-                import re
                 pattern = r'\b' + re.escape(keyword_lower) + r'\b'
                 if re.search(pattern, text_lower):
                     return ticker

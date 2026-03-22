@@ -22,8 +22,12 @@ class KenyaWallStreetScraper(BaseScraper):
         articles = []
 
         try:
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "application/rss+xml,application/xml,text/xml",
+            }
             async with httpx.AsyncClient(timeout=settings.scrape_timeout) as client:
-                response = await client.get(self.RSS_URL)
+                response = await client.get(self.RSS_URL, headers=headers)
                 response.raise_for_status()
 
             feed = feedparser.parse(response.text)
@@ -70,6 +74,10 @@ class KenyaWallStreetScraper(BaseScraper):
         ticker = self.match_ticker(full_text)
 
         if not ticker:
+            return None
+
+        # Filter: Only include financially relevant articles
+        if not self.is_financial_article(full_text):
             return None
 
         return {

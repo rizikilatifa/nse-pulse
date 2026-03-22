@@ -77,6 +77,10 @@ class KBCScraper(BaseScraper):
         if not ticker:
             return None
 
+        # Filter: Only include financially relevant articles
+        if not self.is_financial_article(full_text):
+            return None
+
         return {
             "headline": self.clean_text(headline),
             "url": url,
