@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     model_cache_dir: str = "./model_cache"
 
     # Scraping
-    scrape_timeout: int = 30
+    scrape_timeout: int = 60
     max_articles_per_source: int = 50
 
     # Twitter API (optional)

@@ -13,4 +13,4 @@ services:
       - key: DATABASE_URL
         value: "sqlite+aiosqlite:///./nse_pulse.db"
       - key: USE_FINBERT
-        value: "true"
+        value: "false"

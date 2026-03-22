@@ -5,7 +5,7 @@ set -o errexit
 
 # Install backend dependencies
 cd backend
-pip install -r requirements.txt
+pip install -r requirements-render.txt
 cd ..
 
 # Build frontend
