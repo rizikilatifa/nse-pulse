@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { TrendingUp, RefreshCw, AlertCircle } from 'lucide-react'
 import TickerList from './components/TickerList'
 import HeadlinesPanel from './components/HeadlinesPanel'
 import { fetchTickers, fetchSentiment, triggerScrape } from './api/sentiment'
@@ -9,109 +8,138 @@ function App() {
   const [selectedTicker, setSelectedTicker] = useState(null)
   const [sentimentData, setSentimentData] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [scraping, setScraping] = useState(false)
-  const [error, setError] = useState(null)
+  const [scrapeLoading, setScrapeLoading] = useState(false)
+  const [lastScraped, setLastScraped] = useState(null)
 
   useEffect(() => {
     loadTickers()
   }, [])
 
-  useEffect(() => {
-    if (selectedTicker) {
-      loadSentiment(selectedTicker)
-    }
-  }, [selectedTicker])
-
   const loadTickers = async () => {
+    setLoading(true)
     try {
-      setLoading(true)
-      setError(null)
       const data = await fetchTickers()
       setTickers(data.tickers)
-    } catch (err) {
-      setError('Failed to load tickers. Make sure the backend is running.')
-      console.error(err)
+      setLastScraped(data.last_scraped)
+    } catch (error) {
+      console.error('Failed to load tickers:', error)
     } finally {
       setLoading(false)
     }
   }
 
-  const loadSentiment = async (ticker) => {
+  const handleSelectTicker = async (ticker) => {
+    setSelectedTicker(ticker)
+    setSentimentData(null)
     try {
       const data = await fetchSentiment(ticker)
       setSentimentData(data)
-    } catch (err) {
-      console.error('Failed to load sentiment:', err)
+    } catch (error) {
+      console.error('Failed to load sentiment:', error)
     }
   }
 
   const handleScrape = async () => {
+    setScrapeLoading(true)
     try {
-      setScraping(true)
-      const result = await triggerScrape()
-      // Reload tickers after scrape
+      await triggerScrape()
       await loadTickers()
       if (selectedTicker) {
-        await loadSentiment(selectedTicker)
+        const data = await fetchSentiment(selectedTicker)
+        setSentimentData(data)
       }
-      alert(`Scraped ${result.articles_scraped} articles, processed ${result.articles_processed}`)
-    } catch (err) {
-      alert('Scraping failed. Check the backend logs.')
-      console.error(err)
+    } catch (error) {
+      console.error('Failed to scrape:', error)
     } finally {
-      setScraping(false)
+      setScrapeLoading(false)
     }
   }
 
-  const handleSelectTicker = (ticker) => {
-    setSelectedTicker(ticker)
-    setSentimentData(null)
+  const formatDate = (dateStr) => {
+    if (!dateStr) return 'N/A'
+    return new Date(dateStr).toLocaleString('en-KE', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a1628] via-[#1a365d] to-[#0f1f3a] text-white">
+      {/* Noise texture overlay */}
+      <div className="fixed inset-0 opacity-[0.02] pointer-events-none z-0"
+           style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25 height='100%25 filter='url(%23noiseFilter)'/%3E%3C/svg%3E\")"}} />
+
       {/* Header */}
-      <header className="border-b border-gray-700 bg-gray-900/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-2 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-white" />
+      <header className="relative z-10 border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            {/* Logo & Branding */}
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#d69e2e] to-[#b7791f] flex items-center justify-center shadow-lg shadow-[#d69e2e]/20">
+                  <span className="font-display text-2xl font-bold text-[#0a1628]">N</span>
+                </div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-[#d69e2e]/20 to-transparent rounded-xl blur-sm -z-10" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-white">NSE Pulse</h1>
-                <p className="text-xs text-gray-400">Real-time Sentiment Analysis</p>
+                <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight">
+                  <span className="text-gradient">NSE</span> <span className="text-white/90">Pulse</span>
+                </h1>
+                <p className="text-xs text-white/50 font-mono tracking-wider uppercase">
+                  Real-time Sentiment Analysis
+                </p>
               </div>
             </div>
-            <button
-              onClick={handleScrape}
-              disabled={scraping}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-600 rounded-lg text-white font-medium transition-colors"
-            >
-              <RefreshCw className={`w-4 h-4 ${scraping ? 'animate-spin' : ''}`} />
-              {scraping ? 'Scraping...' : 'Refresh Data'}
-            </button>
+
+            {/* Actions */}
+            <div className="flex items-center gap-4">
+              {lastScraped && (
+                <div className="hidden sm:flex items-center gap-2 text-xs text-white/40 font-mono">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Last sync: {formatDate(lastScraped)}
+                </div>
+              )}
+              <button
+                onClick={handleScrape}
+                disabled={scrapeLoading}
+                className="group relative px-5 py-2.5 rounded-lg font-medium text-sm overflow-hidden transition-all duration-300 disabled:opacity-50"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-[#d69e2e] via-[#ecc94b] to-[#d69e2e] opacity-100 group-hover:opacity-90 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <span className="relative text-[#0a1628] font-semibold">
+                  {scrapeLoading ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Syncing...
+                    </span>
+                  ) : (
+                    'Sync News'
+                  )}
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-6">
-        {error && (
-          <div className="mb-6 p-4 bg-red-900/50 border border-red-700 rounded-lg flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-red-400" />
-            <span className="text-red-200">{error}</span>
-          </div>
-        )}
-
+      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+          <div className="flex items-center justify-center h-96">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-16 h-16 rounded-full border-2 border-[#d69e2e]/30 border-t-[#d69e2e] animate-spin" />
+              <p className="text-white/50 font-mono text-sm">Loading market data...</p>
+            </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Ticker List */}
-            <div className="lg:col-span-1">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Ticker List - Left Column */}
+            <div className="lg:col-span-5 stagger-1">
               <TickerList
                 tickers={tickers}
                 selectedTicker={selectedTicker}
@@ -119,20 +147,27 @@ function App() {
               />
             </div>
 
-            {/* Headlines Panel */}
-            <div className="lg:col-span-2">
+            {/* Sentiment Detail - Right Column */}
+            <div className="lg:col-span-7 stagger-2">
               {selectedTicker ? (
-                <HeadlinesPanel
-                  sentimentData={sentimentData}
-                  loading={!sentimentData && selectedTicker}
-                />
-              ) : (
-                <div className="bg-gray-800/50 rounded-xl p-8 text-center">
-                  <div className="text-gray-400">
-                    <TrendingUp className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                    <p className="text-lg">Select a ticker to view sentiment analysis</p>
-                    <p className="text-sm mt-2">Click on any stock from the list</p>
+                sentimentData ? (
+                  <HeadlinesPanel sentimentData={sentimentData} />
+                ) : (
+                  <div className="flex items-center justify-center h-64 glass-card rounded-2xl">
+                    <div className="w-8 h-8 rounded-full border-2 border-[#d69e2e]/30 border-t-[#d69e2e] animate-spin" />
                   </div>
+                )
+              ) : (
+                <div className="glass-card rounded-2xl p-8 text-center">
+                  <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-white/5 flex items-center justify-center">
+                    <svg className="w-10 h-10 text-[#d69e2e]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4m6 6v-1a4 4 0 00-8 0v-1c0-1.657.343-3 2-3h6z" />
+                    </svg>
+                  </div>
+                  <h3 className="font-display text-xl text-white/60 mb-2">Select a Stock</h3>
+                  <p className="text-sm text-white/40 max-w-sm mx-auto">
+                    Choose a ticker from the list to view detailed sentiment analysis and recent headlines
+                  </p>
                 </div>
               )}
             </div>
@@ -141,9 +176,12 @@ function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-700 mt-8 py-4">
-        <div className="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
-          NSE Pulse — Sentiment Analysis for Nairobi Securities Exchange
+      <footer className="relative z-10 border-t border-white/5 mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/30 font-mono">
+            <p>Powered by FinBERT NLP Engine</p>
+            <p>NSE Pulse © 2026</p>
+          </div>
         </div>
       </footer>
     </div>
