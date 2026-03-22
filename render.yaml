@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: nse-pulse
+    runtime: python
+    plan: free
+    buildCommand: bash build.sh
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL
+        value: "sqlite+aiosqlite:///./nse_pulse.db"
+      - key: USE_FINBERT
+        value: "true"

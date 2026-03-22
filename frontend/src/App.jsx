@@ -72,22 +72,22 @@ function App() {
            style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25 height='100%25 filter='url(%23noiseFilter)'/%3E%3C/svg%3E\")"}} />
 
       {/* Header */}
-      <header className="relative z-10 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <header className="fixed top-0 left-0 right-0 z-20 border-b border-white/10 bg-[#0a1628]/80 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
             {/* Logo & Branding */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#d69e2e] to-[#b7791f] flex items-center justify-center shadow-lg shadow-[#d69e2e]/20">
-                  <span className="font-display text-2xl font-bold text-[#0a1628]">N</span>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#d69e2e] to-[#b7791f] flex items-center justify-center shadow-lg shadow-[#d69e2e]/20">
+                  <span className="font-display text-xl font-bold text-[#0a1628]">N</span>
                 </div>
                 <div className="absolute -inset-1 bg-gradient-to-r from-[#d69e2e]/20 to-transparent rounded-xl blur-sm -z-10" />
               </div>
               <div>
-                <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight">
+                <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight leading-tight">
                   <span className="text-gradient">NSE</span> <span className="text-white/90">Pulse</span>
                 </h1>
-                <p className="text-xs text-white/50 font-mono tracking-wider uppercase">
+                <p className="hidden sm:block text-xs text-white/50 font-mono tracking-wider uppercase">
                   Real-time Sentiment Analysis
                 </p>
               </div>
@@ -96,7 +96,7 @@ function App() {
             {/* Actions */}
             <div className="flex items-center gap-4">
               {lastScraped && (
-                <div className="hidden sm:flex items-center gap-2 text-xs text-white/40 font-mono">
+                <div className="hidden md:flex items-center gap-2 text-xs text-white/40 font-mono">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   Last sync: {formatDate(lastScraped)}
                 </div>
@@ -104,7 +104,7 @@ function App() {
               <button
                 onClick={handleScrape}
                 disabled={scrapeLoading}
-                className="group relative px-5 py-2.5 rounded-lg font-medium text-sm overflow-hidden transition-all duration-300 disabled:opacity-50"
+                className="group relative px-4 py-2 rounded-lg font-medium text-sm overflow-hidden transition-all duration-300 disabled:opacity-50"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-[#d69e2e] via-[#ecc94b] to-[#d69e2e] opacity-100 group-hover:opacity-90 transition-opacity" />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
@@ -128,7 +128,7 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
         {loading ? (
           <div className="flex items-center justify-center h-96">
             <div className="flex flex-col items-center gap-4">

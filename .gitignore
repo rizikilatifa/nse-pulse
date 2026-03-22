@@ -72,3 +72,6 @@ out/
 
 # Railway
 .railway/
+
+# Render build output
+backend/static/

@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 const SentimentBadge = ({ label, score }) => {
   const config = {
     positive: {
@@ -43,7 +45,18 @@ const SentimentBadge = ({ label, score }) => {
 }
 
 function TickerList({ tickers, selectedTicker, onSelect }) {
-  // Count articles with sentiment
+  const [page, setPage] = useState(0)
+  const perPage = 4
+
+  // Sort: stocks with sentiment data first, then without
+  const sorted = [...tickers].sort((a, b) => {
+    const aHas = a.article_count > 0 ? 1 : 0
+    const bHas = b.article_count > 0 ? 1 : 0
+    return bHas - aHas
+  })
+
+  const totalPages = Math.ceil(sorted.length / perPage)
+  const visible = sorted.slice(page * perPage, page * perPage + perPage)
   const activeCount = tickers.filter(t => t.article_count > 0).length
 
   return (
@@ -67,7 +80,7 @@ function TickerList({ tickers, selectedTicker, onSelect }) {
       {/* Ticker Grid */}
       <div className="p-3">
         <div className="grid gap-2">
-          {tickers.map((ticker, index) => {
+          {visible.map((ticker, index) => {
             const isSelected = selectedTicker === ticker.ticker
             const hasData = ticker.article_count > 0
 
@@ -148,6 +161,37 @@ function TickerList({ tickers, selectedTicker, onSelect }) {
           })}
         </div>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="px-5 py-3 border-t border-white/5 flex items-center justify-between">
+          <button
+            onClick={() => setPage(p => p - 1)}
+            disabled={page === 0}
+            className="px-3 py-1.5 rounded-lg text-xs font-mono text-white/50 hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/50"
+          >
+            ← Prev
+          </button>
+          <div className="flex items-center gap-1.5">
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => setPage(i)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  i === page ? 'bg-[#d69e2e] scale-125' : 'bg-white/20 hover:bg-white/40'
+                }`}
+              />
+            ))}
+          </div>
+          <button
+            onClick={() => setPage(p => p + 1)}
+            disabled={page === totalPages - 1}
+            className="px-3 py-1.5 rounded-lg text-xs font-mono text-white/50 hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/50"
+          >
+            Next →
+          </button>
+        </div>
+      )}
     </div>
   )
 }

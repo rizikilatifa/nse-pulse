@@ -1,8 +1,12 @@
 """FastAPI application entry point."""
 
+import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from app.config import settings, NSE_COMPANIES
 from app.database import init_db, async_session
 from app.models import Company
@@ -84,3 +88,17 @@ async def health_check():
         "version": settings.app_version,
         "database": "connected"
     }
+
+
+# Serve frontend static files in production
+STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+if STATIC_DIR.is_dir():
+    app.mount("/assets", StaticFiles(directory=STATIC_DIR / "assets"), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        """Serve the frontend SPA for any non-API route."""
+        file_path = STATIC_DIR / full_path
+        if file_path.is_file():
+            return FileResponse(file_path)
+        return FileResponse(STATIC_DIR / "index.html")
