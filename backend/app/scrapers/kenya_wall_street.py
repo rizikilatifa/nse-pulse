@@ -53,16 +53,17 @@ class KenyaWallStreetScraper(BaseScraper):
         elif entry.get("published"):
             published_at = self.parse_date(entry.published)
 
-        # Get summary/content from RSS
-        content = entry.get("summary", "")
+        # Get full content from RSS (prefer content:encoded over summary)
+        content = ""
+        if hasattr(entry, "content") and entry.content:
+            content = entry.content[0].get("value", "")
+        if not content:
+            content = entry.get("summary", "")
 
-        # Try to fetch full article content
-        try:
-            full_content = await self._fetch_article_content(url)
-            if full_content:
-                content = full_content
-        except Exception:
-            pass
+        # Note: We skip fetching full article content from the website because:
+        # 1. RSS content:encoded usually has the full article
+        # 2. Website content may differ or be behind paywalls
+        # 3. Reduces scraping load and improves reliability
 
         # Match to ticker
         full_text = f"{headline} {content}"
@@ -83,14 +84,17 @@ class KenyaWallStreetScraper(BaseScraper):
     async def _fetch_article_content(self, url: str) -> str:
         """Fetch full article content from URL."""
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Accept": "text/html,application/xhtml+xml",
+            "Cache-Control": "no-cache",
         }
 
-        async with httpx.AsyncClient(timeout=settings.scrape_timeout) as client:
-            response = await client.get(url, headers=headers, follow_redirects=True)
+        async with httpx.AsyncClient(timeout=settings.scrape_timeout, follow_redirects=True) as client:
+            response = await client.get(url, headers=headers)
             response.raise_for_status()
+            html_content = response.text
 
-        soup = BeautifulSoup(response.text, "html.parser")
+        soup = BeautifulSoup(html_content, "html.parser")
 
         for element in soup(["script", "style", "nav", "footer", "header"]):
             element.decompose()

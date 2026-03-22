@@ -52,7 +52,12 @@ class BaseScraper(ABC):
 
         for ticker, data in self.companies_data.items():
             for keyword in data["keywords"]:
-                if keyword.lower() in text_lower:
+                keyword_lower = keyword.lower()
+                # Use word boundary matching to avoid partial matches
+                # e.g., "manageable" should NOT match "eabl"
+                import re
+                pattern = r'\b' + re.escape(keyword_lower) + r'\b'
+                if re.search(pattern, text_lower):
                     return ticker
 
         return None
