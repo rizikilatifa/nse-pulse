@@ -10,6 +10,7 @@ from app.scrapers.kenya_wall_street import KenyaWallStreetScraper
 from app.scrapers.kbc import KBCScraper
 from app.scrapers.pulse_live import PulseLiveScraper
 from app.scrapers.twitter import TwitterScraper
+from app.scrapers.archive_scraper import ArchiveScraper
 from app.config import NSE_COMPANIES
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import Article, Company
@@ -26,6 +27,8 @@ SCRAPERS = [
     # Web scrapers
     TheStarScraper,
     CitizenDigitalScraper,
+    # Archive scrapers (historical data)
+    ArchiveScraper,
     # API scrapers (require authentication)
     TwitterScraper,  # Requires TWITTER_BEARER_TOKEN
     # Currently blocked or unreliable
